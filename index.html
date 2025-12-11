@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login UNIVEM</title>
+<style>
+  /* Reset básico */
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Fundo da página com sua imagem poligonal */
+  body {
+    min-height: 100vh;
+    background: url('imgs/faculdade.avif') no-repeat center center fixed;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  /* Container central */
+  .login-container {
+    display: flex;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+    max-width: 850px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* Área do logo UNIVEM */
+  .login-logo {
+    flex: 1;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+
+  .login-logo img {
+    max-width: 80%;
+    height: auto;
+    user-select: none;
+  }
+
+  /* Área do formulário azul */
+  .login-form {
+    flex: 1;
+    background: rgb(2, 10, 221);
+    color: white;
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 320px;
+  }
+
+  .login-form h2 {
+    margin-bottom: 30px;
+    font-weight: 400;
+    font-size: 1.4rem;
+  }
+
+  /* Input com ícone */
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+
+  .input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 38px;
+    border: none;
+    border-bottom: 1px solid rgba(255,255,255,0.7);
+    background: transparent;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+  }
+
+  .input-group input::placeholder {
+    color: rgba(255,255,255,0.7);
+  }
+
+  .input-group .icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    fill: white;
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+    opacity: 0.8;
+  }
+
+  .input-group .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    fill: white;
+    width: 22px;
+    height: 22px;
+    opacity: 0.8;
+  }
+
+  .login-links {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  .login-links a {
+    color: white;
+    text-decoration: underline;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 4px;
+  }
+
+  .login-button {
+    margin-top: 20px;
+    align-self: flex-end;
+    background: #041c94;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .login-button svg {
+    margin-left: 8px;
+    fill: white;
+    width: 18px;
+    height: 18px;
+  }
+
+  .login-button:hover {
+    background: #031772;
+  }
+
+  .sei-logo {
+    position: absolute;
+    bottom: 20px;
+    right: 30px;
+    width: 130px;
+    user-select: none;
+  }
+
+  @media(max-width: 680px) {
+    body { padding: 10px; }
+    .login-container {
+      flex-direction: column;
+      max-width: 400px;
+      border-radius: 8px;
+    }
+    .login-logo, .login-form {
+      flex: none;
+      width: 100%;
+      padding: 30px 20px;
+    }
+    .login-form { padding-top: 30px; }
+    .login-button {
+      width: 100%;
+      justify-content: center;
+    }
+    .sei-logo {
+      position: static;
+      margin-top: 30px;
+      display: block;
+      width: 100px;
+      align-self: center;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-logo">
+    <img src="https://sei.univem.edu.br/upload/bannerLogin/1728399775098_33805.jpg" alt="UNIVEM Logo" />
+  </div>
+
+  <div class="login-form">
+    <h2>Acesso Sistema</h2>
+
+    <form id="loginForm" autocomplete="off">
+      <div class="input-group">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zM12 14c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <input type="text" id="usuario" placeholder="Usuário" required />
+      </div>
+
+      <div class="input-group">
+        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17a2 2 0 0 0 2-2v-3a2 2 0 0 0-4 0v3a2 2 0 0 0 2 2zm6-4v-1c0-3.31-2.69-6-6-6S6 8.69 6 12v1H4v9h16v-9h-2z"/></svg>
+        <input type="password" id="senha" placeholder="Senha" required />
+        <svg class="toggle-password" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" onclick="togglePassword()">
+          <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-3.03 0-5.5-2.47-5.5-5.5S8.97 6.5 12 6.5s5.5 2.47 5.5 5.5-2.47 5.5-5.5 5.5z"/>
+          <circle cx="12" cy="12" r="2.5"/>
+        </svg>
+      </div>
+
+      <div class="login-links">
+        <a href="#">Redefinir/Esqueceu a senha?</a><br/>
+        <a href="#">Home Candidato</a>
+      </div>
+
+      <button type="submit" class="login-button">
+        Entrar
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+      </button>
+    </form>
+
+    <img src="imgs/sei.png" alt="Logo SEI" class="sei-logo" />
+  </div>
+</div>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById('senha');
+    input.type = input.type === "password" ? "text" : "password";
+  }
+</script>
+
+<!-- ===================== FIREBASE ========================= -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword }
+    from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCf-mJvdeI_djpFWduPywQETpgp_SX8mS0",
+    authDomain: "faculdade-1864e.firebaseapp.com",
+    projectId: "faculdade-1864e",
+    storageBucket: "faculdade-1864e.firebasestorage.app",
+    messagingSenderId: "337262511010",
+    appId: "1:337262511010:web:97c33d8fb79e91b0dae8fb",
+    measurementId: "G-D7KVQD5NC3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // ==== LOGIN ====
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("usuario").value;
+    const senha = document.getElementById("senha").value;
+
+    try {
+      await signInWithEmailAndPassword(auth, email, senha);
+      alert("Login efetuado com sucesso!");
+      window.location.href = "home.html"; // futura página pós-login
+    } catch (err) {
+      alert("Erro ao fazer login: " + err.message);
+    }
+  });
+</script>
+
+</body>
+</html>

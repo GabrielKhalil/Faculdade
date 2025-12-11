@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Painel UNIVEM — Home</title>
+
+<!-- Chart.js para o gráfico -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --blue:#0b2bff;
+    --bg:#f3f3f6;
+    --card-shadow: 0 8px 22px rgba(0,0,0,0.08);
+    --radius:10px;
+    --muted:#8a8a8f;
+    --sidebar-width:84px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:var(--bg);color:#222}
+  .app { display:flex; height:100vh; overflow:hidden; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width:var(--sidebar-width);
+    background:linear-gradient(180deg,var(--blue),#0827e7);
+    color:white;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:12px;
+    border-right:6px solid rgba(0,0,0,0.04);
+    position:relative;
+  }
+  .logo-small{ width:56px; height:34px; background:white; border-radius:4px; margin-bottom:8px; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--blue); font-size:14px; }
+
+  .nav{ display:flex; flex-direction:column; gap:6px; width:100%; align-items:center; padding-top:8px; }
+  .nav-item {
+    width:56px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .nav-item button{
+    width:56px;height:56px;border-radius:10px;border:none;background:transparent;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;
+  }
+  .nav-item button.active{ background: rgba(255,255,255,0.07); box-shadow:0 6px 18px rgba(0,0,0,0.06) inset; }
+  .nav-item .label { margin-top:6px; font-size:11px; color:rgba(255,255,255,0.95); text-align:center; line-height:1; }
+
+  .sidebar .spacer{ flex:1 }
+
+  /* CONTEXT MENU (panel que abre) */
+  .context-panel {
+    position: absolute;
+    left: calc(var(--sidebar-width) + 8px);
+    top: 56px;
+    background: var(--blue);
+    color: white;
+    border-radius: 6px;
+    min-width: 220px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 10px 0;
+    z-index: 60;
+    display:none;
+    flex-direction:column;
+  }
+  .context-panel.show { display:flex; animation:pop .12s ease; }
+  @keyframes pop { from { transform: translateY(-6px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+  .context-item { padding:10px 14px; font-size:14px; color:white; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+  .context-item small { color: rgba(255,255,255,0.8); font-size:12px; }
+  .context-item:hover { background: rgba(255,255,255,0.06); }
+
+  /* main area */
+  .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+
+  .topbar{ height:56px; background:#fff; border-bottom:1px solid #e6e6e9; display:flex; align-items:center; justify-content:space-between; padding:0 20px; box-shadow: 0 1px 0 rgba(0,0,0,0.02); }
+  .top-left{ font-size:14px; color:#222; }
+  .top-right{ display:flex; align-items:center; gap:12px; }
+  .top-right .badge{ background:#fff; border-radius:6px; padding:6px 10px; border:1px solid #eee; display:flex; align-items:center; gap:8px; cursor:pointer; }
+  .top-right .logo-univem{ width:70px; height:auto; opacity:0.95; }
+
+  .page{ padding:18px 22px; height:calc(100vh - 56px); overflow:auto; }
+  .student-info{ background:#fff; border-radius:8px; padding:12px 16px; margin-bottom:14px; border:1px solid #eee; color:var(--muted); font-size:13px; }
+
+  .timeline-wrap{ display:flex; justify-content:center; margin:12px 0 20px; }
+  .timeline{ display:flex; gap:10px; padding:6px; }
+  .timeline .pill{ background:#e7e7f8; padding:6px 12px; border-radius:14px; font-size:13px; color:#6b6bd0; box-shadow:0 3px 0 rgba(107,107,208,0.07); cursor:pointer; }
+  .timeline .pill.active{ background:var(--blue); color:white; box-shadow:0 6px 14px rgba(11,43,255,0.14) }
+
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:22px; align-items:start; }
+  .card{ background:#fff; border-radius:10px; box-shadow:0 8px 22px rgba(0,0,0,0.08); padding:0; overflow:hidden; border:1px solid rgba(0,0,0,0.03); }
+  .card .card-head{ background:var(--blue); color:#fff; padding:12px 16px; font-weight:600; display:flex; justify-content:space-between; align-items:center; }
+  .card .card-body{ padding:20px; }
+  .chart-area{ height:300px; display:flex; align-items:center; justify-content:center; }
+  .links-box{ height:320px; display:flex; align-items:center; justify-content:center; color:var(--muted); font-weight:600; }
+
+  .big-panel{ margin-top:18px; background:#fff; border-radius:8px; padding:18px; box-shadow:0 8px 22px rgba(0,0,0,0.08); min-height:160px; border:1px solid rgba(0,0,0,0.03) }
+  .bottom-bar{ height:46px; background:#fff; border-top:1px solid #e6e6e9; display:flex; align-items:center; justify-content:space-between; padding:6px 18px; font-size:13px; color:#666; margin-top:12px; border-radius:6px; }
+
+  .legend{ display:flex; gap:12px; align-items:center; margin-top:18px; }
+
+  @media(max-width:1000px){
+    .grid{ grid-template-columns:1fr; }
+    .sidebar{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" role="navigation" aria-label="menu lateral">
+    <div class="logo-small" aria-hidden="true">UNV</div>
+
+    <nav class="nav" aria-label="principal">
+      <!-- each nav item has button + label -->
+      <div class="nav-item">
+        <button id="btn-home" class="active" title="Tela Inicial">🏠</button>
+        <div class="label">Tela<br>Inicial</div>
+      </div>
+
+      <div class="nav-item">
+        <button id="btn-fin" title="Financeiro">💲</button>
+        <div class="label">Financeiro</div>
+      </div>
+
+      <div class="nav-item">
+        <button id="btn-serv" title="Serviços On-line">🌐</button>
+        <div class="label">Serviços<br>On-line</div>
+      </div>
+
+      <div class="nav-item">
+        <button id="btn-atalhos" title="Atalhos (ctrl+i)">⌨️</button>
+        <div class="label">Atalhos</div>
+      </div>
+    </nav>
+
+    <div class="spacer"></div>
+
+    <div style="padding:14px 0 22px">
+      <div class="nav-item" style="margin-bottom:0">
+        <button id="btn-context" title="Mais opções">⋯</button>
+        <div class="label">Opções</div>
+      </div>
+    </div>
+
+    <!-- CONTEXT PANEL (abre ao clicar em Opções) -->
+    <div id="contextPanel" class="context-panel" role="menu" aria-hidden="true">
+      <div class="context-item"><span>⚙️ Preferências do Sistema</span><small>alt+1</small></div>
+      <div class="context-item"><span>🔳 Qrcode App Aluno</span><small>alt+2</small></div>
+      <div class="context-item"><span>✉️ Caixa de Mensagem</span><small>alt+3</small></div>
+      <div class="context-item"><span>⇦ Sair</span><small>alt+x</small></div>
+      <div class="context-item"><span>🏠 Tela Inicial</span><small>ctrl+h</small></div>
+    </div>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="top-left">Olá Gabriel - Análise e Desenvolvimento de Sistemas - EaD</div>
+      <div class="top-right">
+        <div class="badge" title="Configurações">⚙️</div>
+        <div class="badge" title="Mensagens">🔔 <span style="color:#ff3b30;margin-left:6px;font-weight:700">14</span></div>
+        <img class="logo-univem" src="https://sei.univem.edu.br/upload/bannerLogin/1728399775098_33805.jpg" alt="UNIVEM">
+      </div>
+    </div>
+
+    <!-- PAGE -->
+    <section class="page">
+
+      <!-- student brief -->
+      <div class="student-info">638633 - Análise e Desenvolvimento de Sistemas - EaD - EAD-20242-5-ADS-202410 - Formado</div>
+
+      <!-- timeline -->
+      <div class="timeline-wrap">
+        <div class="timeline" aria-hidden="true">
+          <div class="pill">2024/2</div>
+          <div class="pill active">2024/1</div>
+          <div class="pill">2023/2</div>
+          <div class="pill">2023/1</div>
+          <div class="pill">2022/2</div>
+          <div class="pill">2022/1</div>
+        </div>
+      </div>
+
+      <!-- grid with cards -->
+      <div class="grid">
+
+        <!-- left card: activities + chart -->
+        <div class="card">
+          <div class="card-head">
+            <div>📊 Atividades Complementares</div>
+            <div style="opacity:0.9">⇱</div>
+          </div>
+          <div class="card-body">
+            <div style="text-align:center;color:var(--muted);font-weight:600;margin-bottom:12px">Atividades Complementares (100.0% de 50h)</div>
+
+            <div class="chart-area">
+              <canvas id="barChart" style="max-width:100%;width:100%;height:100%"></canvas>
+            </div>
+
+            <div class="legend">
+              <div style="display:flex;align-items:center;gap:8px"><span class="dot" style="width:12px;height:12px;border-radius:50%;background:#15b3b3"></span><span class="txt">Realizada</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><span class="dot" style="width:12px;height:12px;border-radius:50%;background:#d8d8d8"></span><span class="txt">Pendente</span></div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- right card: links -->
+        <div class="card">
+          <div class="card-head">
+            <div>🔗 Menu Links Úteis</div>
+            <div style="opacity:0.9">⇱</div>
+          </div>
+          <div class="card-body">
+            <div class="links-box">
+              <div style="width:240px;height:80px;border:1px dashed #eee;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:600">
+                <div style="text-align:center">📚<br><span style="display:block;margin-top:8px">Biblioteca Elivro</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- large bottom white panel (like screenshot) -->
+      <div class="big-panel"></div>
+
+      <!-- page footer -->
+      <div class="bottom-bar">
+        <div>DESENVOLVIDO POR OTIMIZE-TI &nbsp; &nbsp; Versão SEI - 8.0.3.17.03a3cf14</div>
+        <div style="display:flex;gap:18px;align-items:center">
+          <div>⏰ SUA SESSÃO EXPIRA EM 41 MIN</div>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // Chart.js horizontal stacked bars to mimic screenshot
+  const ctx = document.getElementById('barChart').getContext('2d');
+
+  const data = {
+    labels: ['Total','Complementar/Ensino'],
+    datasets: [
+      { label:'Realizada', data:[50,50], backgroundColor:'#0826e6', stack:'Stack 0' },
+      { label:'Pendente', data:[0,0], backgroundColor:'#d8d8d8', stack:'Stack 0' }
+    ]
+  };
+
+  const barChart = new Chart(ctx, {
+    type:'bar',
+    data,
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{
+        callbacks:{ label:function(ctx){ const val=ctx.raw; if(ctx.dataset.label==='Realizada') return `Realizada ${ (val===0?0:100) }% (${val}h)`; return `Pendente ${ (val===0?0:100) }% (${val}h)`; } }
+      }},
+      scales:{ x:{ stacked:true, max:50, grid:{color:'#f0f0f3'} }, y:{ stacked:true, grid:{display:false} } }
+    }
+  });
+
+  // timeline click to toggle active (visual)
+  document.querySelectorAll('.timeline .pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      document.querySelectorAll('.timeline .pill').forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+
+  // CONTEXT PANEL TOGGLE
+  const btnContext = document.getElementById('btn-context');
+  const contextPanel = document.getElementById('contextPanel');
+
+  btnContext.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    // position panel aligned vertically with button (already positioned by CSS left/top default)
+    contextPanel.classList.toggle('show');
+    contextPanel.setAttribute('aria-hidden', contextPanel.classList.contains('show') ? 'false' : 'true');
+  });
+
+  // close when clicking outside
+  document.addEventListener('click', (e)=>{
+    if(!contextPanel.contains(e.target) && e.target !== btnContext){
+      contextPanel.classList.remove('show');
+      contextPanel.setAttribute('aria-hidden','true');
+    }
+  });
+
+  // close on Escape
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'Escape'){
+      contextPanel.classList.remove('show');
+      contextPanel.setAttribute('aria-hidden','true');
+    }
+  });
+
+  // clicking items — for demo we show alerts; replace with real actions
+  document.querySelectorAll('.context-item').forEach(it=>{
+    it.addEventListener('click', ()=>{
+      const txt = it.textContent.trim();
+      alert(txt);
+      contextPanel.classList.remove('show');
+    });
+  });
+
+  // style scrollbars (nice touch)
+  const css = `
+    ::-webkit-scrollbar { height:8px; width:8px; }
+    ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius:8px;}
+    ::-webkit-scrollbar-track { background: transparent; }
+  `;
+  const style = document.createElement('style'); style.appendChild(document.createTextNode(css));
+  document.head.appendChild(style);
+</script>
+
+</body>
+</html>
